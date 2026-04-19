@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TODO リスト</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700&family=Noto+Sans+JP:wght@400;700&family=Noto+Serif+JP:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="font-gothic">
+
+  <!-- ─── Header ─────────────────────────────────────────── -->
+  <header>
+    <h1>📋 TODO リスト</h1>
+    <div class="font-selector">
+      <button class="font-btn" id="btn-gothic"  onclick="setFont('gothic')">ゴシック</button>
+      <button class="font-btn" id="btn-mincho"  onclick="setFont('mincho')">明朝体</button>
+      <button class="font-btn" id="btn-cute"    onclick="setFont('cute')">かわいい</button>
+    </div>
+  </header>
+
+  <!-- ─── Tab Navigation ─────────────────────────────────── -->
+  <nav class="tabs">
+    <button class="tab active" id="tab-daily"   data-period="daily"   onclick="switchTab('daily')">☀️ 今日</button>
+    <button class="tab"        id="tab-weekly"  data-period="weekly"  onclick="switchTab('weekly')">📅 今週</button>
+    <button class="tab"        id="tab-monthly" data-period="monthly" onclick="switchTab('monthly')">🗓️ 今月</button>
+    <button class="tab"        id="tab-yearly"  data-period="yearly"  onclick="switchTab('yearly')">🎯 今年</button>
+  </nav>
+
+  <!-- ─── Content ────────────────────────────────────────── -->
+  <main>
+
+    <!-- 今日 -->
+    <section id="daily" class="tab-content active">
+      <div class="section-header">
+        <div class="period-badge day">日</div>
+        <h2>今日のTODO</h2>
+      </div>
+      <div id="daily-list" class="todo-list"></div>
+    </section>
+
+    <!-- 今週 -->
+    <section id="weekly" class="tab-content">
+      <div class="section-header">
+        <div class="period-badge week">週</div>
+        <h2>今週のTODO</h2>
+      </div>
+      <div id="weekly-list" class="todo-list"></div>
+    </section>
+
+    <!-- 今月 -->
+    <section id="monthly" class="tab-content">
+      <div class="section-header">
+        <div class="period-badge month">月</div>
+        <h2>今月のTODO</h2>
+      </div>
+      <div id="monthly-list" class="todo-list"></div>
+    </section>
+
+    <!-- 今年 -->
+    <section id="yearly" class="tab-content">
+      <div class="section-header">
+        <div class="period-badge year">年</div>
+        <h2>今年のTODO</h2>
+      </div>
+      <div class="reverse-plan-hint">
+        💡 年間目標を追加したら <strong>⬇️ボタン</strong> で月・週・日のTODOに逆算できます
+      </div>
+      <div id="yearly-list" class="todo-list"></div>
+    </section>
+
+  </main>
+
+  <!-- ─── FAB ────────────────────────────────────────────── -->
+  <button class="fab" onclick="openAddModal()" title="TODOを追加">+</button>
+
+  <!-- ─── Add Modal ──────────────────────────────────────── -->
+  <div id="modal" class="modal-overlay" onclick="closeModal(event)">
+    <div class="modal">
+      <h3 id="modal-title">TODO を追加</h3>
+
+      <div class="form-group">
+        <label>🎯 目的（ゴール）</label>
+        <div
+          id="goal-editor"
+          class="text-editor"
+          contenteditable="true"
+          data-placeholder="何を達成したいですか？"
+        ></div>
+        <div class="color-palette" id="goal-colors"></div>
+      </div>
+
+      <div class="form-group">
+        <label>🔧 どうする？（アクション）</label>
+        <div
+          id="action-editor"
+          class="text-editor"
+          contenteditable="true"
+          data-placeholder="具体的にどうやって達成しますか？"
+        ></div>
+        <div class="color-palette" id="action-colors"></div>
+      </div>
+
+      <div class="form-group">
+        <label>📌 期間</label>
+        <select id="period-select">
+          <option value="daily">☀️ 今日</option>
+          <option value="weekly">📅 今週</option>
+          <option value="monthly">🗓️ 今月</option>
+          <option value="yearly">🎯 今年</option>
+        </select>
+      </div>
+
+      <div class="modal-buttons">
+        <button class="btn-cancel" onclick="closeModalDirect()">キャンセル</button>
+        <button class="btn-save"   onclick="saveTodo()">保存する</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── Reverse Plan Modal ─────────────────────────────── -->
+  <div id="reverse-modal" class="modal-overlay" onclick="closeReverseModal(event)">
+    <div class="modal">
+      <h3>⬇️ 逆算プラン</h3>
+      <p id="reverse-goal-text" style="font-size:14px;color:#718096;margin-bottom:18px;line-height:1.6;"></p>
+
+      <div class="form-group">
+        <label>🗓️ 今月のマイルストーン（1行ずつ入力）</label>
+        <textarea id="monthly-breakdown" rows="4"
+          placeholder="例）読書を5冊読む&#10;例）英語の勉強を始める"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>📅 今週のアクション（1行ずつ入力）</label>
+        <textarea id="weekly-breakdown" rows="4"
+          placeholder="例）1週間で1章読む&#10;例）単語を50個覚える"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>☀️ 今日のアクション（1行ずつ入力）</label>
+        <textarea id="daily-breakdown" rows="4"
+          placeholder="例）本を30分読む&#10;例）単語カードを確認する"></textarea>
+      </div>
+
+      <div class="modal-buttons">
+        <button class="btn-cancel" onclick="closeReverseModalDirect()">キャンセル</button>
+        <button class="btn-save"   onclick="applyReversePlan()">TODOに追加</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
