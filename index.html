@@ -104,13 +104,35 @@
       </div>
 
       <div class="form-group">
-        <label>📌 期間</label>
-        <select id="period-select">
+        <label>📌 期間の種類</label>
+        <select id="period-select" onchange="onPeriodChange()">
           <option value="daily">☀️ 今日</option>
           <option value="weekly">📅 今週</option>
           <option value="monthly">🗓️ 今月</option>
           <option value="yearly">🎯 今年</option>
         </select>
+      </div>
+
+      <div class="form-group">
+        <label id="date-label">📅 何年の何月何日用？</label>
+        <div class="date-row">
+          <div class="date-col" id="col-year">
+            <div class="date-col-label">年</div>
+            <select id="sel-year"></select>
+          </div>
+          <div class="date-col" id="col-month">
+            <div class="date-col-label">月（1〜12）</div>
+            <select id="sel-month"></select>
+          </div>
+          <div class="date-col hidden" id="col-week">
+            <div class="date-col-label">第何週（1〜5）</div>
+            <select id="sel-week"></select>
+          </div>
+          <div class="date-col" id="col-day">
+            <div class="date-col-label">日（1〜31）</div>
+            <select id="sel-day"></select>
+          </div>
+        </div>
       </div>
 
       <div class="modal-buttons">
