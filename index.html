@@ -11,25 +11,26 @@
 </head>
 <body class="font-gothic">
 
-  <!-- ─── Header ─────────────────────────────────────────── -->
   <header>
     <h1>📋 TODO リスト</h1>
-    <div class="font-selector">
-      <button class="font-btn" id="btn-gothic"  onclick="setFont('gothic')">ゴシック</button>
-      <button class="font-btn" id="btn-mincho"  onclick="setFont('mincho')">明朝体</button>
-      <button class="font-btn" id="btn-cute"    onclick="setFont('cute')">かわいい</button>
+    <div class="header-right">
+      <button class="icon-btn" id="bell-btn" onclick="openReminderSettings()" title="リマインダー設定">🔔</button>
+      <div class="font-selector">
+        <button class="font-btn" id="btn-gothic" onclick="setFont('gothic')">ゴシック</button>
+        <button class="font-btn" id="btn-mincho" onclick="setFont('mincho')">明朝体</button>
+        <button class="font-btn" id="btn-cute"   onclick="setFont('cute')">かわいい</button>
+      </div>
     </div>
   </header>
 
-  <!-- ─── Tab Navigation ─────────────────────────────────── -->
   <nav class="tabs">
-    <button class="tab active" id="tab-daily"   data-period="daily"   onclick="switchTab('daily')">☀️ 今日</button>
-    <button class="tab"        id="tab-weekly"  data-period="weekly"  onclick="switchTab('weekly')">📅 今週</button>
-    <button class="tab"        id="tab-monthly" data-period="monthly" onclick="switchTab('monthly')">🗓️ 今月</button>
-    <button class="tab"        id="tab-yearly"  data-period="yearly"  onclick="switchTab('yearly')">🎯 今年</button>
+    <button class="tab active" id="tab-daily"    data-period="daily"    onclick="switchTab('daily')">☀️ 今日</button>
+    <button class="tab"        id="tab-weekly"   data-period="weekly"   onclick="switchTab('weekly')">📅 今週</button>
+    <button class="tab"        id="tab-monthly"  data-period="monthly"  onclick="switchTab('monthly')">🗓️ 今月</button>
+    <button class="tab"        id="tab-yearly"   data-period="yearly"   onclick="switchTab('yearly')">🎯 今年</button>
+    <button class="tab"        id="tab-calendar" data-period="calendar" onclick="switchTab('calendar')">📆 カレンダー</button>
   </nav>
 
-  <!-- ─── Content ────────────────────────────────────────── -->
   <main>
 
     <!-- 今日 -->
@@ -66,40 +67,53 @@
         <h2>今年のTODO</h2>
       </div>
       <div class="reverse-plan-hint">
-        💡 年間目標を追加したら <strong>⬇️ボタン</strong> で月・週・日のTODOに逆算できます
+        💡 年間目標を追加したら <strong>⬇️</strong> で月ごとに、月のTODOは <strong>⬇️</strong> で週ごとに逆算できます
       </div>
       <div id="yearly-list" class="todo-list"></div>
     </section>
 
+    <!-- カレンダー -->
+    <section id="calendar" class="tab-content">
+      <div class="section-header">
+        <div class="period-badge cal">暦</div>
+        <h2>カレンダー</h2>
+      </div>
+      <div class="cal-nav">
+        <button class="cal-nav-btn" onclick="calPrev()">◀</button>
+        <span class="cal-month-label" id="cal-month-label"></span>
+        <button class="cal-nav-btn" onclick="calNext()">▶</button>
+        <a href="https://calendar.google.com" target="_blank" rel="noopener" class="gcal-link">📅 Googleカレンダー</a>
+      </div>
+      <div class="cal-weekdays">
+        <div class="cal-wd sun">日</div>
+        <div class="cal-wd">月</div>
+        <div class="cal-wd">火</div>
+        <div class="cal-wd">水</div>
+        <div class="cal-wd">木</div>
+        <div class="cal-wd">金</div>
+        <div class="cal-wd sat">土</div>
+      </div>
+      <div id="cal-grid" class="cal-grid"></div>
+    </section>
+
   </main>
 
-  <!-- ─── FAB ────────────────────────────────────────────── -->
   <button class="fab" onclick="openAddModal()" title="TODOを追加">+</button>
 
-  <!-- ─── Add Modal ──────────────────────────────────────── -->
+  <!-- ─── 追加モーダル ───────────────────────────────── -->
   <div id="modal" class="modal-overlay" onclick="closeModal(event)">
     <div class="modal">
       <h3 id="modal-title">TODO を追加</h3>
 
       <div class="form-group">
         <label>🎯 目的（ゴール）</label>
-        <div
-          id="goal-editor"
-          class="text-editor"
-          contenteditable="true"
-          data-placeholder="何を達成したいですか？"
-        ></div>
+        <div id="goal-editor" class="text-editor" contenteditable="true" data-placeholder="何を達成したいですか？"></div>
         <div class="color-palette" id="goal-colors"></div>
       </div>
 
       <div class="form-group">
         <label>🔧 どうする？（アクション）</label>
-        <div
-          id="action-editor"
-          class="text-editor"
-          contenteditable="true"
-          data-placeholder="具体的にどうやって達成しますか？"
-        ></div>
+        <div id="action-editor" class="text-editor" contenteditable="true" data-placeholder="具体的にどうやって達成しますか？"></div>
         <div class="color-palette" id="action-colors"></div>
       </div>
 
@@ -135,6 +149,32 @@
         </div>
       </div>
 
+      <div class="form-group" id="target-group" style="display:none">
+        <label id="target-label">🏁 いつまでに達成？（任意）</label>
+        <div class="date-row">
+          <div class="date-col" id="target-col-month">
+            <div class="date-col-label">達成月（1〜12）</div>
+            <select id="sel-target-month"><option value="">未設定</option></select>
+          </div>
+          <div class="date-col hidden" id="target-col-week">
+            <div class="date-col-label">達成週（1〜5）</div>
+            <select id="sel-target-week"><option value="">未設定</option></select>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>🔔 リマインダー</label>
+        <div class="reminder-row">
+          <label class="toggle-label">
+            <input type="checkbox" id="cb-reminder">
+            <span class="toggle-switch"></span>
+            <span class="toggle-text">オフ</span>
+          </label>
+          <input type="time" id="reminder-time-input" value="09:00" class="time-input">
+        </div>
+      </div>
+
       <div class="modal-buttons">
         <button class="btn-cancel" onclick="closeModalDirect()">キャンセル</button>
         <button class="btn-save"   onclick="saveTodo()">保存する</button>
@@ -142,33 +182,93 @@
     </div>
   </div>
 
-  <!-- ─── Reverse Plan Modal ─────────────────────────────── -->
+  <!-- ─── 逆算プランモーダル ────────────────────────── -->
   <div id="reverse-modal" class="modal-overlay" onclick="closeReverseModal(event)">
     <div class="modal">
       <h3>⬇️ 逆算プラン</h3>
-      <p id="reverse-goal-text" style="font-size:14px;color:#718096;margin-bottom:18px;line-height:1.6;"></p>
+      <p id="reverse-goal-text" class="reverse-goal-display"></p>
 
-      <div class="form-group">
-        <label>🗓️ 今月のマイルストーン（1行ずつ入力）</label>
-        <textarea id="monthly-breakdown" rows="4"
-          placeholder="例）読書を5冊読む&#10;例）英語の勉強を始める"></textarea>
+      <div id="reverse-months-section" class="form-group" style="display:none">
+        <label>🗓️ 月のTODOを作成（達成したい月を選択）</label>
+        <div class="period-grid" id="month-grid">
+          <button class="pgrid-btn" data-month="1"  onclick="togglePgrid(this)">1月</button>
+          <button class="pgrid-btn" data-month="2"  onclick="togglePgrid(this)">2月</button>
+          <button class="pgrid-btn" data-month="3"  onclick="togglePgrid(this)">3月</button>
+          <button class="pgrid-btn" data-month="4"  onclick="togglePgrid(this)">4月</button>
+          <button class="pgrid-btn" data-month="5"  onclick="togglePgrid(this)">5月</button>
+          <button class="pgrid-btn" data-month="6"  onclick="togglePgrid(this)">6月</button>
+          <button class="pgrid-btn" data-month="7"  onclick="togglePgrid(this)">7月</button>
+          <button class="pgrid-btn" data-month="8"  onclick="togglePgrid(this)">8月</button>
+          <button class="pgrid-btn" data-month="9"  onclick="togglePgrid(this)">9月</button>
+          <button class="pgrid-btn" data-month="10" onclick="togglePgrid(this)">10月</button>
+          <button class="pgrid-btn" data-month="11" onclick="togglePgrid(this)">11月</button>
+          <button class="pgrid-btn" data-month="12" onclick="togglePgrid(this)">12月</button>
+        </div>
+      </div>
+
+      <div id="reverse-weeks-section" class="form-group" style="display:none">
+        <label>📅 週のTODOを作成（達成したい週を選択）</label>
+        <div class="period-grid" id="week-grid">
+          <button class="pgrid-btn" data-week="1" onclick="togglePgrid(this)">第1週</button>
+          <button class="pgrid-btn" data-week="2" onclick="togglePgrid(this)">第2週</button>
+          <button class="pgrid-btn" data-week="3" onclick="togglePgrid(this)">第3週</button>
+          <button class="pgrid-btn" data-week="4" onclick="togglePgrid(this)">第4週</button>
+          <button class="pgrid-btn" data-week="5" onclick="togglePgrid(this)">第5週</button>
+        </div>
       </div>
 
       <div class="form-group">
-        <label>📅 今週のアクション（1行ずつ入力）</label>
-        <textarea id="weekly-breakdown" rows="4"
-          placeholder="例）1週間で1章読む&#10;例）単語を50個覚える"></textarea>
-      </div>
-
-      <div class="form-group">
-        <label>☀️ 今日のアクション（1行ずつ入力）</label>
-        <textarea id="daily-breakdown" rows="4"
-          placeholder="例）本を30分読む&#10;例）単語カードを確認する"></textarea>
+        <label>☀️ 今日のアクション（1行ずつ・任意）</label>
+        <textarea id="daily-breakdown" rows="3" placeholder="例）毎日30分取り組む"></textarea>
       </div>
 
       <div class="modal-buttons">
         <button class="btn-cancel" onclick="closeReverseModalDirect()">キャンセル</button>
         <button class="btn-save"   onclick="applyReversePlan()">TODOに追加</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── リマインダー設定モーダル ────────────────── -->
+  <div id="reminder-modal" class="modal-overlay" onclick="closeReminderSettings(event)">
+    <div class="modal">
+      <h3>🔔 リマインダー設定</h3>
+
+      <div class="form-group">
+        <label>リマインダー機能</label>
+        <label class="toggle-label">
+          <input type="checkbox" id="global-reminder-toggle" onchange="onGlobalReminderChange()">
+          <span class="toggle-switch"></span>
+          <span id="global-reminder-text">オフ</span>
+        </label>
+      </div>
+
+      <div id="reminder-detail" style="display:none">
+        <div class="form-group">
+          <label>毎日の通知時刻</label>
+          <input type="time" id="global-reminder-time" value="09:00" class="time-input-full">
+        </div>
+        <div class="notify-permission-area">
+          <p class="hint-text">ブラウザの通知許可が必要です。</p>
+          <button onclick="requestNotificationPermission()" class="btn-notify">🔔 通知を許可する</button>
+          <p class="permission-status" id="permission-status"></p>
+        </div>
+      </div>
+
+      <div class="modal-buttons">
+        <button class="btn-cancel" onclick="closeReminderSettingsDirect()">閉じる</button>
+        <button class="btn-save"   onclick="saveReminderSettings()">保存する</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── 日付詳細モーダル ─────────────────────────── -->
+  <div id="day-detail-modal" class="modal-overlay" onclick="closeDayDetail(event)">
+    <div class="modal">
+      <h3 id="day-detail-title"></h3>
+      <div id="day-detail-list"></div>
+      <div class="modal-buttons" style="margin-top:16px">
+        <button class="btn-cancel" onclick="closeDayDetailDirect()">閉じる</button>
       </div>
     </div>
   </div>
